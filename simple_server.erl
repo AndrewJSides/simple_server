@@ -1,7 +1,9 @@
 -module(simple_server).
--export([start/0, stop/0, init/2]).
+-behaviour(application).
 
-start() ->
+-export([start/2, stop/1, init/2]).
+
+start(_StartType, _StartArgs) ->
     % odbc:start(),
     Dispatch = cowboy_router:compile([
         {'_', [
@@ -31,7 +33,7 @@ start() ->
     % io:format("Cowboy server started on ~p:~p~n", [Ip, Port]),
     % ok.
 
-stop() ->
+stop(_State) ->
     cowboy:stop_listener(http_listener),
     odbc:stop(),
     io:format("Cowboy server stopped~n"),
