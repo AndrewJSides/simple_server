@@ -10,16 +10,24 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-    % Example: Start a Cowboy server
     Dispatch = cowboy_router:compile([
         {'_', [
-            {"/", my_handler, []}  % Replace with your routes
+            {"/erl/hello", simple_server, hello},
+            {"/", simple_server, index}
         ]}
     ]),
-    {ok, _} = cowboy:start_clear(http_listener,
-                                 [{port, 8080}],
-                                 #{env => #{dispatch => Dispatch}}),
-    {ok, self()}.  % Return a PID to keep the application running
+
+    Port = list_to_integer(os:getenv("PORT", "8080")),
+    case cowboy:start_clear(http_listener,
+                            [{port, Port}],
+                            #{env => #{dispatch => Dispatch}}) of
+        {ok, _Pid} ->
+            io:format("Cowboy started on port ~p~n", [Port]),
+            {ok, self()};
+        {error, Reason} ->
+            io:format("Failed to start Cowboy: ~p~n", [Reason]),
+            {error, Reason}
+    end.
 
 stop(_State) ->
     cowboy:stop_listener(http_listener),
