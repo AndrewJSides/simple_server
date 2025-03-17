@@ -15,16 +15,17 @@ start(_StartType, _StartArgs) ->
     ]),
     Port = list_to_integer(os:getenv("PORT", "8080")),
     Ip = {0, 0, 0, 0},
+    io:format("Attempting to start Cowboy on ~p:~p~n", [Ip, Port]),
     case cowboy:start_clear(http_listener,
                             [{port, Port}, {ip, Ip}],
                             #{env => #{dispatch => Dispatch}}) of
         {ok, _Pid} ->
             io:format("Cowboy server started on ~p:~p~n", [Ip, Port]),
             % Keep the process alive indefinitely
-            timer:sleep(infinity);
+            {ok, _Pid};
         {error, Reason} ->
             io:format("Failed to start Cowboy: ~p~n", [Reason]),
-            error(Reason)
+            {error, Reason}
     end.
     % {ok, _} = cowboy:start_clear(http_listener,
     %     [{port, Port}, {ip, Ip}],
