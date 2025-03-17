@@ -1,17 +1,8 @@
 -module(simple_server).
--export([start/0, stop/0, init/2, start_link/0]).
-
-start_link() ->
-    Pid = spawn_link(fun() -> 
-        start(),
-        receive
-            stop -> stop()
-        end
-    end),
-    {ok, Pid}.
+-export([start/0, stop/0, init/2]).
 
 start() ->
-    odbc:start(),
+    % odbc:start(),
     Dispatch = cowboy_router:compile([
         {'_', [
             {"/erl/hello", ?MODULE, hello},
@@ -21,11 +12,12 @@ start() ->
         ]}
     ]),
     Port = list_to_integer(os:getenv("PORT", "8080")),
+    Ip = {0, 0, 0, 0},
     {ok, _} = cowboy:start_clear(http_listener,
-        [{port, Port}, {ip, {0, 0, 0, 0}}],
+        [{port, Port}, {ip, Ip}],
         #{env => #{dispatch => Dispatch}}
     ),
-    io:format("Cowboy server started on ~p~n", [Port]),
+    io:format("Cowboy server started on ~p:~p~n", [Ip, Port]),
     ok.
 
 stop() ->
