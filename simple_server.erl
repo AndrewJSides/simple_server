@@ -22,7 +22,7 @@ start() ->
     ]),
     Port = list_to_integer(os:getenv("PORT", "8080")),
     {ok, _} = cowboy:start_clear(http_listener,
-        [{port, Port}, {ip, {127, 0, 0, 1}}],
+        [{port, Port}, {ip, {0, 0, 0, 0}}],
         #{env => #{dispatch => Dispatch}}
     ),
     io:format("Cowboy server started on ~p~n", [Port]),
